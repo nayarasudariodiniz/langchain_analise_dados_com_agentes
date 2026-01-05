@@ -37,12 +37,22 @@ def carregar_dados():
 
 dfs_raw = carregar_dados()
 
+# --- 4. TÍTULO E INTRODUÇÃO (MOVIDO PARA FORA DO IF PARA GARANTIR EXIBIÇÃO) ---
+st.title("🚗 IA Analytics: Performance 360º")
+
+with st.expander("ℹ️ Sobre o Sistema", expanded=True):
+    st.markdown("""
+    O sistema consolida automaticamente suas quatro principais planilhas de operação. 
+    Ele fornece uma visão fixa da oficina e do estoque para você nunca perder de vista o capital parado. 
+    Através de filtros inteligentes, ele permite auditar a performance individual de cada vendedor no tempo. 
+    Por fim, ele utiliza um motor de Inteligência Artificial de última geração que funciona como um consultor financeiro, 
+    capaz de ler todos esses números e responder dúvidas estratégicas em segundos, como se você estivesse conversando com um analista humano especializado.
+    """)
+
+st.markdown("---")
+
 if dfs_raw:
     est_pecas, hist_servicos, vendas_pecas, vendas_veiculos = dfs_raw
-
-    # --- 4. TÍTULO ---
-    st.title("🚗 IA Analytics: Performance 360º")
-    st.markdown("---")
 
     # --- 5. INDICADORES FIXOS (ESTOQUE E SERVIÇOS) ---
     st.subheader("📦 Gestão de Estoque (Geral da Loja)")
@@ -137,39 +147,29 @@ if dfs_raw:
     # --- 9. CONSULTORIA ESTRATÉGICA IA ---
     st.subheader("🤖 Consultor de Operações IA")
     
-    # Seção informativa posicionada entre o título e a caixa de pergunta
     with st.expander("ℹ️ O que o modelo consegue responder?", expanded=True):
         st.markdown("""
         ### 1. Análise de Performance de Vendedores
         O agente tem acesso ao faturamento e lucro bruto mensal de cada vendedor.
         * **Ranking de Lucro:** "Quem foi o vendedor mais rentável de 2024 até agora?"
         * **Comparativo Direto:** "O vendedor [Nome A] fatura mais que o [Nome B], mas quem tem a melhor margem de lucro?"
-        * **Identificação de Sazonalidade:** "Em qual mês o vendedor [Nome] teve seu melhor desempenho em termos de lucro bruto?"
 
         ### 2. Diagnóstico de Estoque e Capital
         O agente conhece o Aging Médio e o valor do Capital Obsoleto.
         * **Custo de Oportunidade:** "Considerando que temos R$ [Valor] em peças obsoletas, qual o impacto disso na saúde financeira da loja?"
-        * **Giro de Estoque:** "Nosso aging médio é de [X] dias. Isso é considerado saudável para uma concessionária deste porte?"
-        * **Plano de Ação:** "O que os dados sugerem que eu faça com os veículos que estão acima do aging médio?"
 
         ### 3. Eficiência da Oficina e Pós-Venda
         O agente recebeu o Ticket Médio e a métrica de Peças por O.S.
         * **Aumento de Receita:** "Como podemos aumentar o ticket médio da oficina baseado nos indicadores atuais?"
-        * **Venda Agregada:** "A nossa penetração de peças por Ordem de Serviço está baixa. Como isso afeta o lucro total da assistência?"
-        * **Produtividade:** "O tempo médio de serviço atual indica que precisamos de mais técnicos ou o gargalo é o fluxo de peças?"
 
         ### 4. Consultoria Estratégica (CFO/CEO)
-        Interpretar tendências.
         * **Análise de Risco:** "Atue como meu CFO e me diga: onde estamos perdendo dinheiro hoje?"
-        * **Estratégia de Mix:** "Qual categoria de veículo (SUV, Sedan, Hatch) está deixando a melhor margem e onde devo investir mais em marketing?"
-        * **Previsão Simples:** "Se mantivermos essa margem média e esse volume de vendas, qual a projeção de lucro para o próximo trimestre?"
         """)
 
     pergunta = st.text_input("Digite sua dúvida estratégica abaixo:", placeholder="Ex: Quem vendeu mais em janeiro de 2024?")
 
     if pergunta:
         with st.spinner("IA processando dados estratégicos..."):
-            # Melhoria de compressão de tokens para evitar erro 413
             df_resumo_ia = vendas_veiculos.groupby(["Nome_do_Vendedor_que_Realizou_a_Venda", vendas_veiculos['Data_da_Venda'].dt.strftime('%Y-%m')]).agg({
                 "Valor_da_Venda": "sum", "Lucro_Bruto": "sum"
             }).reset_index().sort_values(by="Valor_da_Venda", ascending=False)
@@ -189,4 +189,4 @@ if dfs_raw:
             except Exception as e:
                 st.error(f"Erro na IA: {e}")
 else:
-    st.error("Arquivos de dados não encontrados.")
+    st.error("Arquivos de dados não encontrados na pasta raiz.")
